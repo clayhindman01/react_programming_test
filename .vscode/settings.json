@@ -15,5 +15,5 @@
   "typescript.tsserver.useSeparateSyntaxServer": false,
   "workbench.colorTheme": "GitHub Dark",
   "editor.lineHeight": 24,
-  "workbench.sideBar.location": "right",
+  "workbench.sideBar.location": "left"
 }

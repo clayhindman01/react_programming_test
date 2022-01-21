@@ -31,6 +31,7 @@ import "./styles.css";
  */
 async function fetchTrendingRepos(language = "", range = "daily") {
   const url = `https://my-github-trending.herokuapp.com/repo?lang=${language}&since=${range}`;
+  console.log(url)
   const response = await fetch(url);
   const json = await response.json();
   const mapItemToRepo = (item) => ({
@@ -87,24 +88,84 @@ function RepoCard({ url, name, description, language, stars, forks }) {
  * You may change the parameters and existing code of this function.
  */
 function RepoFilter() {
+
+  // All options for the lanuage select tag
+  const languageOptions = [
+    {
+      label: "All languages",
+      value: "",
+      key: 1
+    },
+    {
+      label: "C",
+      value: "c",
+      key: 2
+    },
+    {
+      label: "Java",
+      value: "java",
+      key: 3
+    },
+    {
+      label: "JavaScript",
+      value: "javascript",
+      key: 4
+    },
+    {
+      label: "Python",
+      value: "python",
+      key: 5
+    }
+  ];
+
+  // All options for the time frame select tag
+  const timeOptions = [
+    {
+      label: "Daily",
+      value: "daily",
+      key: 1
+    },
+    {
+      label: "Weekly",
+      value: "weekly",
+      key: 2
+    },
+    {
+      label: "Monthly",
+      value: "monthly",
+      key: 3
+    }
+  ];
+
+  let languageValue = "";
+  let timeValue = "daily";
+
+  function handleChangeLanguage(e) {
+    languageValue = e.target.value;
+    console.log(fetchTrendingRepos(languageValue, timeValue))
+  }
+
+  function handleChangeTime(e) {
+    timeValue = e.target.value;
+    console.log(fetchTrendingRepos(languageValue, timeValue));
+  }
+
   return (
     <div className="repo-filter">
       <div className="select-group">
         <FileBinaryIcon size={16} />
-        <select>
-          <option value="">All languages</option>
-          <option value="c">C</option>
-          <option value="java">Java</option>
-          <option value="javascript">JavaScript</option>
-          <option value="python">Python</option>
+        <select onChange={(e) => handleChangeLanguage(e)}>
+          {languageOptions.map((option) => (
+            <option value={option.value}>{option.label}</option>
+          ))}
         </select>
       </div>
       <div className="select-group">
         <ClockIcon size={16} />
-        <select>
-          <option value="daily">Daily</option>
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
+        <select onChange={(e) => handleChangeTime(e)}>
+          {timeOptions.map((option) => (
+            <option value={option.value}>{option.label}</option>
+          ))}
         </select>
       </div>
     </div>
