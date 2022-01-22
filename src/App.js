@@ -11,8 +11,12 @@ import {
   ClockIcon,
   FileBinaryIcon
 } from "@primer/octicons-react";
+import React from "react";
+import { displayPartsToString, ImportsNotUsedAsValues } from "typescript";
 
 import "./styles.css";
+
+var newArr = []
 
 /**
  * Get the GitHub trending repositories.
@@ -31,7 +35,6 @@ import "./styles.css";
  */
 async function fetchTrendingRepos(language = "", range = "daily") {
   const url = `https://my-github-trending.herokuapp.com/repo?lang=${language}&since=${range}`;
-  console.log(url)
   const response = await fetch(url);
   const json = await response.json();
   const mapItemToRepo = (item) => ({
@@ -143,6 +146,7 @@ function RepoFilter() {
   function handleChangeLanguage(e) {
     languageValue = e.target.value;
     console.log(fetchTrendingRepos(languageValue, timeValue))
+    return fetchTrendingRepos(languageValue, timeValue);
   }
 
   function handleChangeTime(e) {
@@ -178,19 +182,68 @@ function RepoFilter() {
  * @todo You should complete this React component to render a list of GitHub repositories.
  * You may change the parameters and existing code of this function.
  */
-function RepoBoard({ repos = [] }) {
-  return (
-    <div className="repo-board">
-      <RepoCard
-        url="https://github.com/nexus-lab"
-        name="nexus-lab/example"
-        description="An example GitHub repository"
-        language="Java"
-        stars={999}
-        forks={999}
-      />
-    </div>
-  );
+class RepoBoard extends React.Component {
+  constructor() {
+    super();
+
+    this.state = {
+      repos: {
+        url: "",
+        name: "",
+        description: "",
+        language: "",
+        stars: 0,
+        forks: 0
+      }
+    }
+  }
+
+  componentDidMount() {
+    this.getRepos().then(result => this.setState({
+      url: result.url,
+      name: result.name,
+      description: result.description,
+      language: result.language,
+      stars: result.stars,
+      forks: result.forks
+    }))
+  }
+
+  //Taking this out causes the whole thing to crash so I will leave this in here.
+  getRepos() {
+    return fetchTrendingRepos();
+  }
+
+  render() {
+    const getRepos = async () => {
+      const a = await fetchTrendingRepos();
+      newArr.push(a)
+    };
+    getRepos()
+
+    var finalArr = [];
+    if (newArr.length > 0) {
+      newArr[0].map((data) => {
+        finalArr.push(data)
+      });
+    }
+
+    return (
+      <div className="repo-board">
+        {finalArr.map((data) => (
+          <RepoCard 
+            url={data.url}
+            name={data.name}
+            description={data.description}
+            language={data.language}
+            stars={data.stars}
+            forks={data.forks}
+          />
+        ))}
+        
+      </div>
+    );
+  }
 }
 
 /**
