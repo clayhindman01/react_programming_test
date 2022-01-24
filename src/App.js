@@ -97,27 +97,22 @@ function RepoFilter() {
     {
       label: "All languages",
       value: "",
-      key: 1
     },
     {
       label: "C",
       value: "c",
-      key: 2
     },
     {
       label: "Java",
       value: "java",
-      key: 3
     },
     {
       label: "JavaScript",
       value: "javascript",
-      key: 4
     },
     {
       label: "Python",
       value: "python",
-      key: 5
     }
   ];
 
@@ -126,17 +121,14 @@ function RepoFilter() {
     {
       label: "Daily",
       value: "daily",
-      key: 1
     },
     {
       label: "Weekly",
       value: "weekly",
-      key: 2
     },
     {
       label: "Monthly",
       value: "monthly",
-      key: 3
     }
   ];
 
@@ -160,7 +152,7 @@ function RepoFilter() {
         <FileBinaryIcon size={16} />
         <select onChange={(e) => handleChangeLanguage(e)}>
           {languageOptions.map((option) => (
-            <option value={option.value}>{option.label}</option>
+            <option key={Math.random()} value={option.value}>{option.label}</option>
           ))}
         </select>
       </div>
@@ -168,7 +160,7 @@ function RepoFilter() {
         <ClockIcon size={16} />
         <select onChange={(e) => handleChangeTime(e)}>
           {timeOptions.map((option) => (
-            <option value={option.value}>{option.label}</option>
+            <option key={Math.random()} value={option.value}>{option.label}</option>
           ))}
         </select>
       </div>
@@ -231,7 +223,8 @@ class RepoBoard extends React.Component {
     return (
       <div className="repo-board">
         {finalArr.map((data) => (
-          <RepoCard 
+          <RepoCard
+            key={Math.random()}
             url={data.url}
             name={data.name}
             description={data.description}
@@ -240,7 +233,7 @@ class RepoBoard extends React.Component {
             forks={data.forks}
           />
         ))}
-        
+
       </div>
     );
   }
