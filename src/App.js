@@ -140,7 +140,12 @@ class RepoFilter extends React.Component {
       <div className="repo-filter">
         <div className="select-group">
           <FileBinaryIcon size={16} />
-          <select onChange={(e) => this.props.setLanguageValue(e.target.value)}>
+          <select onChange={(e) => {
+
+            //Handles changing the languageValue prop and recalibrates the repo prop with the new languageValue
+            this.props.setLanguageValue(e.target.value);
+            this.props.setRepos(fetchTrendingRepos(this.props.languageValue, this.props.rangeValue))
+          }}>
             {languageOptions.map((option) => (
               <option key={Math.random()} value={option.value}>{option.label}</option>
             ))}
@@ -148,7 +153,12 @@ class RepoFilter extends React.Component {
         </div>
         <div className="select-group">
           <ClockIcon size={16} />
-          <select onChange={(e) => this.props.setRangeValue(e.target.value)}>
+          <select onChange={(e) => {
+
+            //Handles changing the rangeValue prop and recalibrates the repo prop with the new rangeValue
+            this.props.setRangeValue(e.target.value);
+            this.props.setRepos(fetchTrendingRepos(this.props.languageValue, this.props.rangeValue))
+          }}>
             {timeOptions.map((option) => (
               <option key={Math.random()} value={option.value}>{option.label}</option>
             ))}
@@ -172,22 +182,13 @@ class RepoBoard extends React.Component {
 
   componentDidMount() {
     this.getRepos().then(result => this.setState({
-      url: result.url,
+      key: Math.random()
     }))
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.languageValue != prevProps.languageValue) {
-      console.log(this.props.languageValue)
-      this.props.setRepos(this.props.languageValue, this.props.rangeValue)
-      console.log(this.props.languageValue)
-      this.getRepos()
-    }
-  }
+  };
 
   //Taking this out causes the whole thing to crash so I will leave this in here.
   getRepos() {
-    return this.props.repos;
+    return this.props.repos
   }
 
   render() {
@@ -250,6 +251,7 @@ function GitHubTrending() {
         rangeValue={rangeValue}
         setRepos={setRepos}
       />
+      {console.log()}
     </div>
   );
 }
