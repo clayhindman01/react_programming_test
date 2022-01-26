@@ -143,9 +143,11 @@ class RepoFilter extends React.Component {
           <select onChange={(e) => {
 
             //Handles changing the languageValue prop and recalibrates the repo prop with the new languageValue
+            //Wrote it inline instead of making a handler function because I would get an error that this.props was not defined.
             this.props.setLanguageValue(e.target.value);
             this.props.setRepos(fetchTrendingRepos(this.props.languageValue, this.props.rangeValue))
-          }}>
+          }}
+            value={this.props.languageValue}>
             {languageOptions.map((option) => (
               <option key={Math.random()} value={option.value}>{option.label}</option>
             ))}
@@ -158,16 +160,12 @@ class RepoFilter extends React.Component {
             //Handles changing the rangeValue prop and recalibrates the repo prop with the new rangeValue
             this.props.setRangeValue(e.target.value);
             this.props.setRepos(fetchTrendingRepos(this.props.languageValue, this.props.rangeValue))
-          }}>
+          }}
+            value={this.props.rangeValue}>
             {timeOptions.map((option) => (
               <option key={Math.random()} value={option.value}>{option.label}</option>
             ))}
           </select>
-          <button onClick={() => {
-            var counter = this.props.counter + 1
-            this.props.setRepos(fetchTrendingRepos(this.props.languageValue, this.props.rangeValue))
-            this.props.increamentCounter(counter)
-          }}>{this.props.counter}</button>
         </div>
       </div>
     );
@@ -191,15 +189,9 @@ class RepoBoard extends React.Component {
     }))
   };
 
-  componentDidUpdate(prevProps) {
-    if (this.props.repos != prevProps.repos) {
-      console.log(this.props.repos)
-    }
-  }
-
   //Taking this out causes the whole thing to crash so I will leave this in here.
   getRepos() {
-    return this.props.repos
+    return fetchTrendingRepos(this.props.languageValue, this.props.rangeValue)
   };
 
   render() {
@@ -215,6 +207,7 @@ class RepoBoard extends React.Component {
       newArr[0].map((data) => {
         finalArr.push(data)
       });
+      console.log(newArr)
       newArr = []
     }
 
@@ -245,11 +238,10 @@ class RepoBoard extends React.Component {
  */
 function GitHubTrending() {
 
-    const [languageValue, setLanguageValue] = useState("")
-    const [rangeValue, setRangeValue] = useState("daily")
-    const [repos, setRepos] = useState(fetchTrendingRepos(languageValue, rangeValue))
-    const [counter, increamentCounter] = useState(0)
-  
+  const [languageValue, setLanguageValue] = useState("")
+  const [rangeValue, setRangeValue] = useState("daily")
+  const [repos, setRepos] = useState(fetchTrendingRepos(languageValue, rangeValue))
+
   return (
     <div>
       <RepoFilter
@@ -259,8 +251,6 @@ function GitHubTrending() {
         setRangeValue={setRangeValue}
         repos={repos}
         setRepos={setRepos}
-        counter={counter}
-        increamentCounter={increamentCounter}
       />
       <RepoBoard
         repos={repos}
@@ -272,7 +262,7 @@ function GitHubTrending() {
       {console.log(repos)}
     </div>
   );
-  }
+}
 
 /**
  * The main entry of the app.
