@@ -189,7 +189,7 @@ class RepoBoard extends React.Component {
   //Taking this out causes the whole thing to crash so I will leave this in here.
   getRepos() {
     return this.props.repos
-  }
+  };
 
   render() {
     const getRepo = async () => {
