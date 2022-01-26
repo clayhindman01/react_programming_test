@@ -11,13 +11,12 @@ import {
   ClockIcon,
   FileBinaryIcon
 } from "@primer/octicons-react";
-import React from "react";
+import React, { useState } from "react";
 import { displayPartsToString, ImportsNotUsedAsValues } from "typescript";
 
 import "./styles.css";
 
 var newArr = []
-
 /**
  * Get the GitHub trending repositories.
  *
@@ -90,82 +89,74 @@ function RepoCard({ url, name, description, language, stars, forks }) {
  * @todo You should complete this React component to implement functions for select language and time range.
  * You may change the parameters and existing code of this function.
  */
-function RepoFilter() {
+class RepoFilter extends React.Component {
 
-  // All options for the lanuage select tag
-  const languageOptions = [
-    {
-      label: "All languages",
-      value: "",
-    },
-    {
-      label: "C",
-      value: "c",
-    },
-    {
-      label: "Java",
-      value: "java",
-    },
-    {
-      label: "JavaScript",
-      value: "javascript",
-    },
-    {
-      label: "Python",
-      value: "python",
-    }
-  ];
-
-  // All options for the time frame select tag
-  const timeOptions = [
-    {
-      label: "Daily",
-      value: "daily",
-    },
-    {
-      label: "Weekly",
-      value: "weekly",
-    },
-    {
-      label: "Monthly",
-      value: "monthly",
-    }
-  ];
-
-  let languageValue = "";
-  let timeValue = "daily";
-
-  function handleChangeLanguage(e) {
-    languageValue = e.target.value;
-    console.log(fetchTrendingRepos(languageValue, timeValue))
-    return fetchTrendingRepos(languageValue, timeValue);
+  constructor(props) {
+    super(props);
   }
 
-  function handleChangeTime(e) {
-    timeValue = e.target.value;
-    console.log(fetchTrendingRepos(languageValue, timeValue));
-  }
+  render() {
+    // All options for the lanuage select tag
+    const languageOptions = [
+      {
+        label: "All languages",
+        value: "",
+      },
+      {
+        label: "C",
+        value: "c",
+      },
+      {
+        label: "Java",
+        value: "java",
+      },
+      {
+        label: "JavaScript",
+        value: "javascript",
+      },
+      {
+        label: "Python",
+        value: "python",
+      }
+    ];
 
-  return (
-    <div className="repo-filter">
-      <div className="select-group">
-        <FileBinaryIcon size={16} />
-        <select onChange={(e) => handleChangeLanguage(e)}>
-          {languageOptions.map((option) => (
-            <option key={Math.random()} value={option.value}>{option.label}</option>
-          ))}
-        </select>
+    // All options for the time frame select tag
+    const timeOptions = [
+      {
+        label: "Daily",
+        value: "daily",
+      },
+      {
+        label: "Weekly",
+        value: "weekly",
+      },
+      {
+        label: "Monthly",
+        value: "monthly",
+      }
+    ];
+
+    return (
+      <div className="repo-filter">
+        <div className="select-group">
+          <FileBinaryIcon size={16} />
+          <select onChange={(e) => this.props.setLanguageValue(e.target.value)}>
+            {languageOptions.map((option) => (
+              <option key={Math.random()} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
+        <div className="select-group">
+          <ClockIcon size={16} />
+          <select onChange={(e) => this.props.setRangeValue(e.target.value)}>
+            {timeOptions.map((option) => (
+              <option key={Math.random()} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
-      <div className="select-group">
-        <ClockIcon size={16} />
-        <select onChange={(e) => handleChangeTime(e)}>
-          {timeOptions.map((option) => (
-            <option key={Math.random()} value={option.value}>{option.label}</option>
-          ))}
-        </select>
-      </div>
-    </div>
-  );
+    );
+  }
 }
 
 /**
@@ -175,43 +166,36 @@ function RepoFilter() {
  * You may change the parameters and existing code of this function.
  */
 class RepoBoard extends React.Component {
-  constructor() {
-    super();
-
-    this.state = {
-      repos: {
-        url: "",
-        name: "",
-        description: "",
-        language: "",
-        stars: 0,
-        forks: 0
-      }
-    }
+  constructor(props) {
+    super(props);
   }
 
   componentDidMount() {
     this.getRepos().then(result => this.setState({
       url: result.url,
-      name: result.name,
-      description: result.description,
-      language: result.language,
-      stars: result.stars,
-      forks: result.forks
     }))
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.languageValue != prevProps.languageValue) {
+      console.log(this.props.languageValue)
+      this.props.setRepos(this.props.languageValue, this.props.rangeValue)
+      console.log(this.props.languageValue)
+      this.getRepos()
+    }
   }
 
   //Taking this out causes the whole thing to crash so I will leave this in here.
   getRepos() {
-    return fetchTrendingRepos();
+    return this.props.repos;
   }
 
   render() {
-    const getRepos = async () => {
-      const a = await fetchTrendingRepos();
+    const getRepo = async () => {
+      const a = await this.props.repos;
       newArr.push(a)
     };
-    getRepos()
+    getRepo()
 
     var finalArr = [];
     if (newArr.length > 0) {
@@ -246,10 +230,26 @@ class RepoBoard extends React.Component {
  * You may change the parameters and existing code of this function.
  */
 function GitHubTrending() {
+  const [languageValue, setLanguageValue] = useState("")
+  const [rangeValue, setRangeValue] = useState("daily")
+  const [repos, setRepos] = useState(fetchTrendingRepos(languageValue, rangeValue))
+
   return (
     <div>
-      <RepoFilter />
-      <RepoBoard />
+      <RepoFilter
+        languageValue={languageValue}
+        setLanguageValue={setLanguageValue}
+        rangeValue={rangeValue}
+        setRangeValue={setRangeValue}
+        repos={repos}
+        setRepos={setRepos}
+      />
+      <RepoBoard
+        repos={repos}
+        languageValue={languageValue}
+        rangeValue={rangeValue}
+        setRepos={setRepos}
+      />
     </div>
   );
 }
