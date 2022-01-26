@@ -204,7 +204,7 @@ class RepoBoard extends React.Component {
 
   render() {
     const getRepo = async () => {
-      const a = await this.props.repos;
+      const a = await fetchTrendingRepos(this.props.languageValue, this.props.rangeValue);
       newArr.push(a)
       console.log(newArr)
     };
