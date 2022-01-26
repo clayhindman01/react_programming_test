@@ -11,8 +11,8 @@ import {
   ClockIcon,
   FileBinaryIcon
 } from "@primer/octicons-react";
-import React, { useState } from "react";
-import { displayPartsToString, ImportsNotUsedAsValues } from "typescript";
+import React, { useEffect, useState } from "react";
+import { displayPartsToString, ImportsNotUsedAsValues, LanguageVariant } from "typescript";
 
 import "./styles.css";
 
@@ -163,6 +163,11 @@ class RepoFilter extends React.Component {
               <option key={Math.random()} value={option.value}>{option.label}</option>
             ))}
           </select>
+          <button onClick={() => {
+            var counter = this.props.counter + 1
+            this.props.setRepos(fetchTrendingRepos(this.props.languageValue, this.props.rangeValue))
+            this.props.increamentCounter(counter)
+          }}>{this.props.counter}</button>
         </div>
       </div>
     );
@@ -186,6 +191,12 @@ class RepoBoard extends React.Component {
     }))
   };
 
+  componentDidUpdate(prevProps) {
+    if (this.props.repos != prevProps.repos) {
+      console.log(this.props.repos)
+    }
+  }
+
   //Taking this out causes the whole thing to crash so I will leave this in here.
   getRepos() {
     return this.props.repos
@@ -193,8 +204,9 @@ class RepoBoard extends React.Component {
 
   render() {
     const getRepo = async () => {
-      const a = await this.props.repos;
+      const a = await fetchTrendingRepos(this.props.languageValue, this.props.rangeValue);
       newArr.push(a)
+      console.log(newArr)
     };
     getRepo()
 
@@ -203,6 +215,7 @@ class RepoBoard extends React.Component {
       newArr[0].map((data) => {
         finalArr.push(data)
       });
+      newArr = []
     }
 
     return (
@@ -231,10 +244,12 @@ class RepoBoard extends React.Component {
  * You may change the parameters and existing code of this function.
  */
 function GitHubTrending() {
-  const [languageValue, setLanguageValue] = useState("")
-  const [rangeValue, setRangeValue] = useState("daily")
-  const [repos, setRepos] = useState(fetchTrendingRepos(languageValue, rangeValue))
 
+    const [languageValue, setLanguageValue] = useState("")
+    const [rangeValue, setRangeValue] = useState("daily")
+    const [repos, setRepos] = useState(fetchTrendingRepos(languageValue, rangeValue))
+    const [counter, increamentCounter] = useState(0)
+  
   return (
     <div>
       <RepoFilter
@@ -244,6 +259,8 @@ function GitHubTrending() {
         setRangeValue={setRangeValue}
         repos={repos}
         setRepos={setRepos}
+        counter={counter}
+        increamentCounter={increamentCounter}
       />
       <RepoBoard
         repos={repos}
@@ -251,10 +268,11 @@ function GitHubTrending() {
         rangeValue={rangeValue}
         setRepos={setRepos}
       />
-      {console.log()}
+      {console.log(languageValue)}
+      {console.log(repos)}
     </div>
   );
-}
+  }
 
 /**
  * The main entry of the app.
